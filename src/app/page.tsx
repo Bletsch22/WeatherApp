@@ -1,6 +1,10 @@
 "use client";
 
+//weather + Forecast domain helpers
+// NOTE: If any of these helpers use process.env directly at the top level,
+// add the guard shown above to avoid "process is not defined" in the browser.
 import { useEffect, useState, useRef, type FormEvent } from "react";
+
 import {
   loadWeatherByCity,
   loadWeatherByCoords,
@@ -17,8 +21,7 @@ import {
   type ForecastDay,
 } from "@/lib/forecast";
 
-import { getMoonPhase } from "@/lib/astro";
-import { getMoonCalendar } from "@/lib/astro";
+import { getMoonPhase, getMoonCalendar } from "@/lib/astro";
 
 import {
   initLocations,
@@ -417,19 +420,6 @@ function SavedLocationsDropdown(props: {
             zIndex: 50,
           }}
         >
-          {/* Clear selection row */}
-          {/* <div style={styles.dropdownRow}>
-            <button
-              type="button"
-              onClick={() => handleSelect("")}
-              style={{ ...styles.dropdownItem, flex: 1 }}
-              role="option"
-              aria-selected={value === ""}
-            >
-              -- Select Location --
-            </button>
-          </div> */}
-
           {options.map((opt) => (
             <div key={opt} style={styles.dropdownRow}>
               {/* City label (click to select) */}
