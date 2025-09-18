@@ -3,8 +3,12 @@
 //weather + Forecast domain helpers
 // NOTE: If any of these helpers use process.env directly at the top level,
 // add the guard shown above to avoid "process is not defined" in the browser.
+
 import { useEffect, useState, useRef, type FormEvent } from "react";
 
+// ===== Weather + Forecast domain helpers =====
+// NOTE: If any of these helpers use process.env directly at the top level,
+// add the guard shown above to avoid "process is not defined" in the browser.
 import {
   loadWeatherByCity,
   loadWeatherByCoords,
@@ -21,8 +25,10 @@ import {
   type ForecastDay,
 } from "@/lib/forecast";
 
+// ===== Astronomy helpers =====
 import { getMoonPhase, getMoonCalendar } from "@/lib/astro";
 
+// ===== Saved locations helpers =====
 import {
   initLocations,
   addLocation,
@@ -30,13 +36,12 @@ import {
   removeLocation,
 } from "@/lib/LocationList";
 
-const moonCal = getMoonCalendar(8);
-const moon = getMoonPhase();
+const moonCal = getMoonCalendar(8); // Example: a small upcoming moon calendar (not rendered right now)
+const moon = getMoonPhase(); // Today's moon phase (fraction in [0..1))
 
-//const { tUnit, windUnit } = labelsFor(units);
-// Component state
+// Component: Home
 export default function Home() {
-  //Hooks
+  //Hooks or React State
   const [city, setCity] = useState("");
   const [status, setStatus] = useState("");
   const [units, setUnits] = useState<Units>("imperial"); // mph, °F default
@@ -204,7 +209,7 @@ export default function Home() {
 
   return (
     <main style={styles.container}>
-      <h1 style={styles.title}>Kyle's Weather Details</h1>
+      <h1 style={styles.title}>Kyle's Weather Report</h1>
 
       <form onSubmit={handleSearch} style={styles.row}>
         <input

@@ -21,6 +21,7 @@ install tslib: Bash command: npm install tslib --save
 These are exported functions from the "lib" folder that are imported to the component side with is "app/page.tsx"
 
 The Idea of "state"
-state = the memory of a component
-
--
+-More or less variables that react watches
+-state = the memory of a component
+-It's data that belongs to that component and can change over time
+-When state changes, React re-renders the component to reflect new values in the UI.
