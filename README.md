@@ -1,7 +1,8 @@
 Things to do:
--fix the history of locations or make a pin for locations list
--add a monthly visual calender outlook for moonPhases(current moonPhase only)
+-fix the history of locations or make a pin for locations list(complete)
 
+-add a monthly visual calender outlook for moonPhase
+can only see real time moonPhase.
 
 To be determined:
 
