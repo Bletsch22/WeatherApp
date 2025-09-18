@@ -449,7 +449,7 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     minHeight: "100dvh",
     padding: 24,
-
+    //maxwidth: 820,
     margin: "0 auto",
     color: "#e6ecff",
     background: "radial-gradient(1000px 600px at 80% -10%, #1a2452, #0b1020)",

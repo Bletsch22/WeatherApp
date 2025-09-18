@@ -69,14 +69,6 @@ function buildWeatherQuery(input: string): { qParam: string; want: GeoWant } {
     .filter(Boolean);
 
   if (parts.length === 1) {
-    const words = raw.split(" ");
-    if (words.length > 1) {
-      const city = words.slice(0, -1).join(" ");
-      const region = words[words.length - 1];
-      parts = [city, region];
-    }
-  }
-  if (parts.length === 1) {
     const [city] = parts;
     return { qParam: encodeURIComponent(city), want: {} };
   }
