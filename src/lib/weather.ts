@@ -61,7 +61,7 @@ async function fetchJson<T>(url: string): Promise<T> {
 function buildWeatherQuery(input: string): { qParam: string; want: GeoWant } {
   // Normalize tokens: "City", or"City, ST", or "City, ST, Country", or "City, Country" // this is a helper function for loadWeatherByCity()
 
-  let raw = input.trim().replace(/\s+,/g, " ");
+  const raw = input.trim().replace(/\s+,/g, " ");
 
   let parts = input
     .split(",")

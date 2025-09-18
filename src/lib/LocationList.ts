@@ -1,6 +1,3 @@
-import { useState, useEffect } from "react";
-import { json } from "stream/consumers";
-
 const KEY_LIST = "locations";
 const KEY_LAST = "lastCity";
 

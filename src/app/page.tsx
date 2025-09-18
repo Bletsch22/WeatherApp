@@ -3,7 +3,7 @@
 //weather + Forecast domain helpers
 // NOTE: If any of these helpers use process.env directly at the top level,
 // add the guard shown above to avoid "process is not defined" in the browser.
-
+import Image from "next/image";
 import { useEffect, useState, useRef, type FormEvent } from "react";
 
 // ===== Weather + Forecast domain helpers =====
@@ -16,7 +16,6 @@ import {
   type Units,
   convertTemp,
   convertWind,
-  labelsFor,
 } from "@/lib/weather";
 
 import {
@@ -26,7 +25,7 @@ import {
 } from "@/lib/forecast";
 
 // ===== Astronomy helpers =====
-import { getMoonPhase, getMoonCalendar } from "@/lib/astro";
+import { getMoonPhase } from "@/lib/astro";
 
 // ===== Saved locations helpers =====
 import {
@@ -36,22 +35,17 @@ import {
   removeLocation,
 } from "@/lib/LocationList";
 
-const moonCal = getMoonCalendar(8); // Example: a small upcoming moon calendar (not rendered right now)
 const moon = getMoonPhase(); // Today's moon phase (fraction in [0..1))
 
 // Component: Home
 export default function Home() {
   //Hooks or React State
   const [city, setCity] = useState("");
-  const [status, setStatus] = useState("");
+
   const [units, setUnits] = useState<Units>("imperial"); // mph, °F default
   const [data, setData] = useState<UiData | null>(null);
   const [forecast, setForecast] = useState<ForecastDay[] | null>(null);
-  const [last, setLast] = useState<{
-    lat: number;
-    lon: number;
-    label: string;
-  } | null>(null);
+
   const [locations, setLocations] = useState<string[]>([]);
   const [selectedCity, setSelectedCity] = useState<string>("");
 
@@ -60,22 +54,21 @@ export default function Home() {
     e.preventDefault();
     if (!city.trim()) return;
 
-    setStatus(`Searching "${city}"...`);
+    // setStatus(`Searching "${city}"...`);
     setData(null);
     setForecast(null);
 
     try {
       const wx = await loadWeatherByCity(city, units);
       setData(wx);
-      setLast(null);
 
       const fc = await loadForecastByCity(city, units);
       setForecast(fc);
 
-      setStatus("");
+      // setStatus("");
     } catch (err) {
       console.log(err);
-      setStatus(err instanceof Error ? err.message : "Something went wrong.");
+      // setStatus(err instanceof Error ? err.message : "Something went wrong.");
     }
   }
 
@@ -110,57 +103,38 @@ export default function Home() {
   // geolocation handler
   function handleGeoClick() {
     if (!navigator.geolocation) {
-      setStatus("Geolocation not supported.");
+      // setStatus("Geolocation not supported.");
       return;
     }
 
-    setStatus("Detecting your location…");
+    // setStatus("Detecting your location…");
 
-    navigator.geolocation.getCurrentPosition(
-      async ({ coords }) => {
-        try {
-          const wx = await loadWeatherByCoords(
-            {
-              lat: coords.latitude,
-              lon: coords.longitude,
-              label: "Your location",
-            },
-            units
-          );
-          setData(wx);
-          setLast({
+    navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+      try {
+        const wx = await loadWeatherByCoords(
+          {
             lat: coords.latitude,
             lon: coords.longitude,
             label: "Your location",
-          });
+          },
+          units
+        );
+        setData(wx);
 
-          const fc = await loadForecastByCoords(
-            { lat: coords.latitude, lon: coords.longitude },
-            units
-          );
-          setForecast(fc);
+        const fc = await loadForecastByCoords(
+          { lat: coords.latitude, lon: coords.longitude },
+          units
+        );
+        setForecast(fc);
 
-          setStatus("");
-        } catch (err) {
-          console.error(err);
-          setStatus(
-            err instanceof Error ? err.message : "Something went wrong."
-          );
-        }
-      },
-      (err) => {
-        const msg =
-          err.code === 1
-            ? "Permission denied. Please allow location access."
-            : err.code === 2
-              ? "Position unavailable."
-              : err.code === 3
-                ? "Location request timed out."
-                : err.message || "Location error.";
-        setStatus(msg);
-      },
-      { enableHighAccuracy: false, maximumAge: 300_000, timeout: 10_000 }
-    );
+        // setStatus("");
+      } catch (err) {
+        console.error(err);
+        // setStatus(
+        //   err instanceof Error ? err.message : "Something went wrong."
+        // );
+      }
+    });
   }
 
   // save location button handler
@@ -185,15 +159,6 @@ export default function Home() {
     }
   }
 
-  // select change handler
-  function handlePickSaved(e: React.ChangeEvent<HTMLSelectElement>): void {
-    const c = e.target.value;
-    setSelectedCity(c);
-    setLastCity(c);
-    loadWeatherByCity(c, units).then(setData);
-    loadForecastByCity(c, units).then(setForecast);
-  }
-
   const tUnit = units === "imperial" ? "°F" : "°C";
   const windUnit = units === "imperial" ? "mph" : "m/s";
 
@@ -205,11 +170,11 @@ export default function Home() {
       loadWeatherByCity(lastCity, units).then(setData);
       loadForecastByCity(lastCity, units).then(setForecast);
     }
-  }, []);
+  }, [units]);
 
   return (
     <main style={styles.container}>
-      <h1 style={styles.title}>Kyle's Weather Report</h1>
+      <h1 style={styles.title}>Kyle&apos;s Weather Report</h1>
 
       <form onSubmit={handleSearch} style={styles.row}>
         <input
@@ -272,7 +237,7 @@ export default function Home() {
           </div>
 
           <div style={styles.current}>
-            <img src={data.icon} alt={data.desc} width={96} height={96} />
+            <Image src={data.icon} alt={data.desc} width={96} height={96} />
             <div>
               <div style={styles.bigTemp}>
                 {data.temp}
@@ -320,7 +285,7 @@ export default function Home() {
                   <strong>{d.label}</strong>
                 </div>
                 <div style={{ display: "grid", placeItems: "center" }}>
-                  <img src={d.icon} alt={d.desc} width={64} height={64} />
+                  <Image src={d.icon} alt={d.desc} width={64} height={64} />
                 </div>
                 <div
                   style={{ textAlign: "center", textTransform: "capitalize" }}
