@@ -18,7 +18,7 @@ export const convertTemp = (n: number, from: Units, to: Units) =>
 
 //speed conversions
 export const mphToMs = (mph: number) => mph * 0.44704;
-export const msToMph = (ms: number) => ms / 0.044704;
+export const msToMph = (ms: number) => ms / 0.44704;
 
 export const convertWind = (n: number, from: Units, to: Units) =>
   from === to ? n : to === "metric" ? mphToMs(n) : msToMph(n);
@@ -61,15 +61,15 @@ async function fetchJson<T>(url: string): Promise<T> {
 function buildWeatherQuery(input: string): { qParam: string; want: GeoWant } {
   // Normalize tokens: "City", or"City, ST", or "City, ST, Country", or "City, Country" // this is a helper function for loadWeatherByCity()
 
-  const raw = input.trim().replace(/\s+,/g, " ");
+  const raw = input.trim().replace(/\s+,/g, ","); // remove spaces before commas
 
-  let parts = input
+  const parts = input
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
 
   if (parts.length === 1) {
-    const [city] = parts;
+    const [city] = raw.split(/\s+/);
     return { qParam: encodeURIComponent(city), want: {} };
   }
   if (parts.length === 2) {
@@ -129,7 +129,7 @@ export async function loadWeatherByCity(
 // compass degree to direction conversions
 function degToCompass(deg: number | undefined): string {
   if (deg === undefined || isNaN(deg)) return "-";
-  const dirs = ["N", "NE", "NW", "S", "SE", "SW", "E", "W"];
+  const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
   return dirs[Math.round(deg / 45) % 8];
 }
 
