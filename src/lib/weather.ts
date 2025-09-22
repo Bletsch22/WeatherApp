@@ -1,6 +1,6 @@
 import type { GeoResult, WeatherResponse } from "@/types/openweather";
 
-const API_KEY = process.env?.NEXT_PUBLIC_OPENWEATHER_KEY ??"";
+const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_KEY ?? "";
 
 // Types and helpers
 
