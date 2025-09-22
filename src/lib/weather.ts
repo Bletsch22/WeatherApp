@@ -1,9 +1,6 @@
 import type { GeoResult, WeatherResponse } from "@/types/openweather";
 
-const API_KEY =
-  (typeof process !== "undefined" &&
-    process.env?.NEXT_PUBLIC_OPENWEATHER_KEY) ||
-  "";
+const API_KEY = process.env?.NEXT_PUBLIC_OPENWEATHER_KEY ??"";
 
 // Types and helpers
 
@@ -47,7 +44,7 @@ type GeoWant = {
 };
 
 //generic fetcher
-async function fetchJson<T>(url: string): Promise<T> {
+export async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
   if (!res.ok) {
     const text = await res.text().catch(() => "");
@@ -58,20 +55,33 @@ async function fetchJson<T>(url: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+export async function labelForCoords(lat:number, lon: number): Promise<string> {
+  const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${API_KEY}`;
+  const rev = await fetchJson<GeoResult[]>(url);
+
+  if(!rev?.length)return `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+  const {name, state, country } =rev[0];
+  return [name, state, country].filter(Boolean).join(", ")
+}
+
+
 function buildWeatherQuery(input: string): { qParam: string; want: GeoWant } {
-  // Normalize tokens: "City", or"City, ST", or "City, ST, Country", or "City, Country" // this is a helper function for loadWeatherByCity()
+  // Normalize tokens: "City", or"City, ST", or "City, State, Country", or "City, Country" // this is a helper function for loadWeatherByCity()
 
-  const raw = input.trim().replace(/\s+,/g, ","); // remove spaces before commas
+  let raw = input.trim().replace(/\s+,/g, ","); // remove spaces before commas
+  
+  if (!raw.includes(",")) {
 
-  const parts = input
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
+    raw = raw.replace(/^(.*\S)\s+(\S+){2,3}$/, "$1, $2")
+  }
+
+  const parts = raw.split(",").map((s) => s.trim()).filter(Boolean);
 
   if (parts.length === 1) {
-    const [city] = raw.split(/\s+/);
+    const city = parts[0];
     return { qParam: encodeURIComponent(city), want: {} };
   }
+
   if (parts.length === 2) {
     const [city, region] = parts;
     const st = region.toUpperCase();
@@ -80,12 +90,12 @@ function buildWeatherQuery(input: string): { qParam: string; want: GeoWant } {
     if (/^[A-Z]{2}$/.test(st)) {
       //*
       return {
-        qParam: encodeURIComponent(`${city},${region},US`),
+        qParam: encodeURIComponent(`${city},${region},US`), 
         want: { state: st, country: "US" },
       };
     }
     return {
-      qParam: encodeURIComponent(`${city},${region}`),
+      qParam: encodeURIComponent(`${city},${region}`), 
       want: { country: st },
     };
   }
@@ -100,10 +110,7 @@ function buildWeatherQuery(input: string): { qParam: string; want: GeoWant } {
 }
 
 // geoCoding + weather in one call
-export async function loadWeatherByCity(
-  q: string,
-  units: Units
-): Promise<UiData> {
+export async function loadWeatherByCity(q: string,units: Units): Promise<UiData> {
   const { qParam, want } = buildWeatherQuery(q);
 
   const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${qParam}&limit=5&appid=${API_KEY}`;
@@ -126,9 +133,10 @@ export async function loadWeatherByCity(
     units
   );
 }
+
 // compass degree to direction conversions
 function degToCompass(deg: number | undefined): string {
-  if (deg === undefined || isNaN(deg)) return "-";
+  if (deg === undefined || Number.isNaN(deg)) return "-";
   const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
   return dirs[Math.round(deg / 45) % 8];
 }

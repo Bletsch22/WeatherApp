@@ -1,16 +1,16 @@
 import type { GeoResult, ForecastResponse } from "@/types/openweather";
-import { type Units } from "./weather";
+import { type Units, fetchJson } from "./weather";
 
 const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_KEY!;
 
-async function fetchJson<T>(url: string): Promise<T> {
-  const res = await fetch(url);
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`request failed: ${res.status} ${res.statusText} -${text}`);
-  }
-  return res.json() as Promise<T>;
-}
+// async function fetchJson<T>(url: string): Promise<T> {
+//   const res = await fetch(url);
+//   if (!res.ok) {
+//     const text = await res.text().catch(() => "");
+//     throw new Error(`request failed: ${res.status} ${res.statusText} -${text}`);
+//   }
+//   return res.json() as Promise<T>;
+// }
 
 export type ForecastDay = {
   date: string;
@@ -128,6 +128,7 @@ export async function loadForecastByCity(q: string, units: Units) {
 
   const geo = await fetchJson<GeoResult[]>(geoUrl);
 
+  if(!geo?.length) throw new Error("No matching city found.");
   const { lat, lon } = geo[0];
   return loadForecastByCoords({ lat, lon }, units);
 }

@@ -12,6 +12,7 @@ import { useEffect, useState, useRef, type FormEvent } from "react";
 import {
   loadWeatherByCity,
   loadWeatherByCoords,
+  labelForCoords,
   type UiData,
   type Units,
   convertTemp,
@@ -101,21 +102,23 @@ export default function Home() {
   }
 
   // geolocation handler
-  function handleGeoClick() {
-    if (!navigator.geolocation) {
-      // setStatus("Geolocation not supported.");
-      return;
-    }
+   function handleGeoClick() {
+    if (!navigator.geolocation) return;
 
     // setStatus("Detecting your location…");
 
     navigator.geolocation.getCurrentPosition(async ({ coords }) => {
       try {
+
+        // reverse goecode to a friendly label
+        const label = await labelForCoords(coords.latitude, coords.longitude);
+
+        // load weather/forecast using that label
         const wx = await loadWeatherByCoords(
           {
             lat: coords.latitude,
             lon: coords.longitude,
-            label: "Your location",
+            label: `${label}`,
           },
           units
         );
@@ -126,6 +129,7 @@ export default function Home() {
           units
         );
         setForecast(fc);
+        setCity(label);
 
         // setStatus("");
       } catch (err) {
@@ -319,10 +323,10 @@ function SavedLocationsDropdown(props: {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  function handleSelect(val: string) {
-    onChange(val);
-    setOpen(false);
-  }
+  // function handleSelect(val: string) {
+  //   onChange(val);
+  //   setOpen(false);
+  // }
 
   // Close when clicking outside
   useEffect(() => {
@@ -390,46 +394,44 @@ function SavedLocationsDropdown(props: {
             zIndex: 50,
           }}
         >
-          {options.map((opt) => (
-            <div key={opt} style={styles.dropdownRow}>
-              {/* City label (click to select) */}
-              <button
-                type="button"
-                onClick={() => handleSelect(opt)}
-                style={{
-                  ...styles.dropdownItem,
-                  flex: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  ...(opt === value ? styles.dropdownItemActive : null),
-                }}
-                role="option"
-                aria-selected={opt === value}
-              >
-                {opt}
-                {/* Inline delete icon */}
-                <svg
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(opt);
-                  }}
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="#e6ecff"
-                  style={{
-                    marginLeft: 8,
-                    cursor: "pointer",
-                    flexShrink: 0,
-                    opacity: 0.85,
-                  }}
-                >
-                  <path d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v9h-2V9zm4 0h2v9h-2V9zM6 9h2v9H6V9z" />
-                </svg>
-              </button>
-            </div>
-          ))}
+          {options.length === 0 && (
+  <div style={{ ...styles.dropdownItem, opacity: 0.7 }}>
+    (no saved locations yet)
+  </div>
+)}
+
+{options.map((opt) => (
+  <div key={opt} style={styles.dropdownRow}>
+    <button
+      type="button"
+      onClick={() => {
+        onChange(opt);
+        setOpen(false);
+      }}
+      style={{
+        ...styles.dropdownItem,
+        ...(opt === value ? styles.dropdownItemActive : null),
+      }}
+      role="option"
+      aria-selected={opt === value}
+    >
+      {opt}
+    </button>
+
+    <button
+      type="button"
+      onClick={() => onDelete(opt)}
+      title="Remove"
+      aria-label={`Remove ${opt}`}
+      style={styles.deleteIconBtn}
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#9fb0d9" aria-hidden>
+        <path d="M18.3 5.7a1 1 0 0 0-1.4 0L12 10.6 7.1 5.7A1 1 0 0 0 5.7 7.1L10.6 12l-4.9 4.9a1 1 0 1 0 1.4 1.4L12 13.4l4.9 4.9a1 1 0 0 0 1.4-1.4L13.4 12l4.9-4.9a1 1 0 0 0 0-1.4z"/>
+      </svg>
+    </button>
+  </div>
+))}
+
         </div>
       )}
     </div>
