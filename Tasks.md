@@ -1,4 +1,6 @@
 Things to do:
+-fix biased forecast(complete)
+-fix location card and save location function(complete)
 -fix the history of locations or make a pin for locations list(complete)
 
 -add a monthly visual calender outlook for moonPhase

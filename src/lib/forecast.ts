@@ -29,10 +29,11 @@ type GeoWant = {
 };
 
 // summarize 3- hour chunks into daily min/max + midday icon
+type WithTz = {city?: { timezone?: number} };
 
-function getTz(resp: ForecastResponse): number {
-  const anyResp = resp as any;
-  const tz = anyResp?.city?.timezone;
+function getTz(resp: ForecastResponse & WithTz): number {
+  
+  const tz = resp.city?.timezone;
   return typeof tz ==="number" ? tz : 0;
 }
 
