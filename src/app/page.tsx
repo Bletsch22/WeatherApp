@@ -303,7 +303,7 @@ export default function Home() {
         .title { font-size: clamp(1.2rem, 2.5vw, 1.6rem); }
         .bigTemp { font-size: clamp(2.2rem, 6vw, 3rem); }
 
-        /* Stack search controls and make them finger-friendly on narrow screens */
+        //  Stack search controls and make them finger-friendly on narrow screens 
         @media (max-width: 640px) {
           .controls {
             width: 100%;
@@ -330,7 +330,7 @@ export default function Home() {
           .page { padding: 16px !important; }
         }
 
-        /* Reduce motion if user prefers */
+         Reduce motion if user prefers */
         @media (prefers-reduced-motion: reduce) {
           * { scroll-behavior: auto; }
         }
