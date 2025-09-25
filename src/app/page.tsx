@@ -176,39 +176,39 @@ export default function Home() {
     }
   }, [units]);
 
-  return (
-    <main style={styles.container}>
-      <h1 style={styles.title}>Kyle&apos;s Weather Report</h1>
+// ...your imports unchanged
 
-      <form onSubmit={handleSearch} style={styles.row}>
+  return (
+    <main className="page" style={styles.container}>
+      <h1 className="title" style={styles.title}>Kyle&apos;s Weather Report</h1>
+
+      <form onSubmit={handleSearch} className="controls" style={styles.row}>
         <input
           value={city}
           onChange={(e) => setCity(e.target.value)}
           placeholder="Search city…"
           aria-label="City"
-          style={styles.input}
+          className="textInput"
+          style={{ ...styles.input, width: "min(100%, 320px)" }}  // ← was 240
         />
-        <button type="submit" style={styles.btn}>
-          Search
-        </button>
+        <button type="submit" className="btn" style={styles.btn}>Search</button>
         <button
           type="button"
           onClick={toggleUnits}
           aria-pressed={units === "metric"}
+          className="btn"
           style={styles.btn}
         >
           {tUnit}
         </button>
-        <button type="button" onClick={handleGeoClick} style={styles.btn}>
+        <button type="button" onClick={handleGeoClick} className="btn" style={styles.btn}>
           My location
         </button>
       </form>
 
-      {/* save location drop down*/}
-      <div
-        style={{ marginTop: 12, display: "flex", gap: 8, alignItems: "center" }}
-      >
-        <button type="button" onClick={handleSaveLocation} style={styles.btn}>
+      {/* save location drop down */}
+      <div className="saveRow" style={{ marginTop: 12, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <button type="button" className="btn" onClick={handleSaveLocation} style={styles.btn}>
           Save Location
         </button>
 
@@ -216,7 +216,6 @@ export default function Home() {
           value={selectedCity}
           options={locations}
           onChange={(val) => {
-            // replicate your handlePickSaved behavior
             setSelectedCity(val);
             setLastCity(val);
             if (val) {
@@ -234,84 +233,112 @@ export default function Home() {
       </div>
 
       {data && (
-        <section style={styles.card}>
-          <div style={styles.header}>
+        <section className="card" style={styles.card}>
+          <div className="cardHeader" style={styles.header}>
             <h2 style={{ margin: 0 }}>{data.label}</h2>
             <div style={styles.muted}>Updated {data.updated}</div>
           </div>
 
-          <div style={styles.current}>
-            <Image src={data.icon} alt={data.desc} width={96} height={96} />
+          <div className="current" style={{ ...styles.current, gridTemplateColumns: "80px 1fr" }}>
+            <Image src={data.icon} alt={data.desc} width={80} height={80} sizes="80px" />
             <div>
-              <div style={styles.bigTemp}>
-                {data.temp}
-                {tUnit}
+              <div className="bigTemp" style={styles.bigTemp}>
+                {data.temp}{tUnit}
               </div>
-              <div style={styles.muted}>
-                Feels like {data.feels}
-                {tUnit}
-              </div>
-              <div style={{ textTransform: "capitalize", marginTop: 4 }}>
-                {data.desc}
-              </div>
+              <div style={styles.muted}>Feels like {data.feels}{tUnit}</div>
+              <div style={{ textTransform: "capitalize", marginTop: 4 }}>{data.desc}</div>
             </div>
           </div>
 
-          <div style={styles.metaGrid}>
+          <div
+            className="metaGrid"
+            style={{
+              ...styles.metaGrid,
+              // auto-fit columns that collapse nicely on mobile
+              gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+            }}
+          >
             <Meta label="Humidity" value={`${data.humidity}%`} />
-            <Meta
-              label="Wind"
-              value={`${data.wind} ${windUnit} ${data.windDir}`}
-            />
+            <Meta label="Wind" value={`${data.wind} ${windUnit} ${data.windDir}`} />
             <Meta label="Pressure" value={`${data.pressure} hPa`} />
-            <Meta
-              label="Moon"
-              value={`${moon.label} ${moon.emoji} Illumination: ${moon.illumPercent}%`}
-            />
+            <Meta label="Moon" value={`${moon.label} ${moon.emoji} Illumination: ${moon.illumPercent}%`} />
           </div>
         </section>
       )}
 
       {forecast && forecast.length > 0 && (
-        <section style={styles.card}>
+        <section className="card" style={styles.card}>
           <h3 style={{ margin: 0 }}>5-Day Forecast</h3>
           <div
+            className="forecastGrid"
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(5, 1fr)",
+              // auto-fit cards; on phones this becomes 1–2 per row
+              gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
               gap: 8,
               marginTop: 12,
             }}
           >
             {forecast.map((d) => (
               <div key={d.date} style={styles.metaBox}>
-                <div style={{ textAlign: "center" }}>
-                  <strong>{d.label}</strong>
-                </div>
+                <div style={{ textAlign: "center" }}><strong>{d.label}</strong></div>
                 <div style={{ display: "grid", placeItems: "center" }}>
-                  <Image src={d.icon} alt={d.desc} width={64} height={64} />
+                  <Image src={d.icon} alt={d.desc} width={64} height={64} sizes="64px" />
                 </div>
-                <div
-                  style={{ textAlign: "center", textTransform: "capitalize" }}
-                >
-                  {d.desc}
-                </div>
-                <div style={{ textAlign: "center" }}>
-                  {d.min} / <strong>{d.max}</strong>
-                </div>
+                <div style={{ textAlign: "center", textTransform: "capitalize" }}>{d.desc}</div>
+                <div style={{ textAlign: "center" }}>{d.min} / <strong>{d.max}</strong></div>
               </div>
             ))}
           </div>
         </section>
       )}
+
       <footer style={styles.footer}>
-        <small style={styles.muted}>
-          Powered by OpenWeather • Next.js + TypeScript
-        </small>
+        <small style={styles.muted}>Powered by OpenWeather • Next.js + TypeScript</small>
       </footer>
+
+      {/* --- mobile responsiveness --- */}
+      <style jsx>{`
+        /* Make text sizes adapt a bit */
+        .title { font-size: clamp(1.2rem, 2.5vw, 1.6rem); }
+        .bigTemp { font-size: clamp(2.2rem, 6vw, 3rem); }
+
+        /* Stack search controls and make them finger-friendly on narrow screens */
+        @media (max-width: 640px) {
+          .controls {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+          }
+          .textInput,
+          .btn {
+            width: 100%;
+            padding: 14px 14px;          /* ≥44px tall */
+          }
+          .current {
+            grid-template-columns: 64px 1fr !important;
+            gap: 10px;
+          }
+          .saveRow {
+            gap: 6px;
+          }
+        }
+
+        /* Slightly tighten layout on very small phones */
+        @media (max-width: 380px) {
+          .page { padding: 16px !important; }
+        }
+
+        /* Reduce motion if user prefers */
+        @media (prefers-reduced-motion: reduce) {
+          * { scroll-behavior: auto; }
+        }
+      `}</style>
     </main>
   );
 }
+
 //new for dropdown
 function SavedLocationsDropdown(props: {
   value: string;
@@ -430,7 +457,7 @@ function SavedLocationsDropdown(props: {
       </svg>
     </button>
   </div>
-))}
+    ))}
 
         </div>
       )}
@@ -449,7 +476,7 @@ function Meta({ label, value }: { label: string; value: string }) {
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    minHeight: "100dvh",
+    // minHeight: "100dvh",
     padding: 24,
     //maxwidth: 820,
     margin: "0 auto",
