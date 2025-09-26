@@ -292,9 +292,6 @@ export default function Home() {
           {/* HEADER */}
           <div className="cardHeader" style={styles.header}>
             <h2 style={{ margin: 0 }}>{data.label}</h2>
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <div style={styles.muted}>Updated {data.updated}</div>
-            </div>
             <button
               type="button"
               className="btn"
@@ -307,6 +304,9 @@ export default function Home() {
             >
               Hourly Forecast
             </button>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <div style={styles.muted}>Updated {data.updated}</div>
+            </div>
           </div>
 
           {/* TODAY GRID: left = current, right = meta */}
