@@ -57,7 +57,7 @@ function frac1(x: number): number {
 export function getMoonCalendar(days = 7, start: Date = new Date()) {
   const out: Array<{ date: string; phase: MoonPhase }> = [];
   const startUTC = new Date(
-    Date.UTC(start.getFullYear(), start.getUTCMonth(), start.getUTCDate())
+    Date.UTC(start.getFullYear(), start.getUTCMonth(), start.getUTCDate()),
   );
 
   for (let i = 0; i < days; i++) {

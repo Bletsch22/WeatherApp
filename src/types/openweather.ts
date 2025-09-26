@@ -1,7 +1,7 @@
-export type GeoResult ={
+export type GeoResult = {
   name: string;
   lat: number;
-  lon: number; 
+  lon: number;
   state?: string;
   country: string;
 };
@@ -10,35 +10,35 @@ export type ForecastResponse = {
   list: Array<{
     dt: number;
     dt_txt?: string; // string timestamp
-    main: { temp: number; temp_min: number; temp_max: number};
-    weather?: {description?: string; icon?: string; main?: string}[];
+    main: { temp: number; temp_min: number; temp_max: number };
+    weather?: { description?: string; icon?: string; main?: string }[];
   }>;
-  city?: {name: string; country?: string };
-}
+  city?: { name: string; country?: string };
+};
 
 export type WeatherResponse = {
   dt: number;
   name: string;
 
   sys?: {
-    country?: string
+    country?: string;
   };
 
-  weather?:{
-    description?: string; 
+  weather?: {
+    description?: string;
     icon?: string;
-    main?: string;      
-  }[]
+    main?: string;
+  }[];
 
-  main:{
+  main: {
     temp: number;
     feels_like: number;
-    humidity: number; 
-    pressure: number
+    humidity: number;
+    pressure: number;
   };
 
   wind: {
     speed: number;
     deg?: number;
-  }
-}
+  };
+};

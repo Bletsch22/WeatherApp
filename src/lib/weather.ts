@@ -37,6 +37,7 @@ export type UiData = {
   wind: number; // speed
   windDir: string; // compass direction
   pressure: number; // barometric pressure
+  coords?: { lat: number; lon: number };
 };
 type GeoWant = {
   state?: string;
@@ -49,33 +50,37 @@ export async function fetchJson<T>(url: string): Promise<T> {
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(
-      `Request failed: ${res.status} ${res.statusText} — ${text}`
+      `Request failed: ${res.status} ${res.statusText} — ${text}`,
     );
   }
   return res.json() as Promise<T>;
 }
 
-export async function labelForCoords(lat:number, lon: number): Promise<string> {
+export async function labelForCoords(
+  lat: number,
+  lon: number,
+): Promise<string> {
   const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${API_KEY}`;
   const rev = await fetchJson<GeoResult[]>(url);
 
-  if(!rev?.length)return `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
-  const {name, state, country } =rev[0];
-  return [name, state, country].filter(Boolean).join(", ")
+  if (!rev?.length) return `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+  const { name, state, country } = rev[0];
+  return [name, state, country].filter(Boolean).join(", ");
 }
-
 
 function buildWeatherQuery(input: string): { qParam: string; want: GeoWant } {
   // Normalize tokens: "City", or"City, ST", or "City, State, Country", or "City, Country" // this is a helper function for loadWeatherByCity()
 
   let raw = input.trim().replace(/\s+,/g, ","); // remove spaces before commas
-  
-  if (!raw.includes(",")) {
 
-    raw = raw.replace(/^(.*\S)\s+(\S+){2,3}$/, "$1, $2")
+  if (!raw.includes(",")) {
+    raw = raw.replace(/^(.*\S)\s+(\S+){2,3}$/, "$1, $2");
   }
 
-  const parts = raw.split(",").map((s) => s.trim()).filter(Boolean);
+  const parts = raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 
   if (parts.length === 1) {
     const city = parts[0];
@@ -90,12 +95,12 @@ function buildWeatherQuery(input: string): { qParam: string; want: GeoWant } {
     if (/^[A-Z]{2}$/.test(st)) {
       //*
       return {
-        qParam: encodeURIComponent(`${city},${region},US`), 
+        qParam: encodeURIComponent(`${city},${region},US`),
         want: { state: st, country: "US" },
       };
     }
     return {
-      qParam: encodeURIComponent(`${city},${region}`), 
+      qParam: encodeURIComponent(`${city},${region}`),
       want: { country: st },
     };
   }
@@ -110,7 +115,10 @@ function buildWeatherQuery(input: string): { qParam: string; want: GeoWant } {
 }
 
 // geoCoding + weather in one call
-export async function loadWeatherByCity(q: string,units: Units): Promise<UiData> {
+export async function loadWeatherByCity(
+  q: string,
+  units: Units,
+): Promise<UiData> {
   const { qParam, want } = buildWeatherQuery(q);
 
   const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${qParam}&limit=5&appid=${API_KEY}`;
@@ -123,14 +131,14 @@ export async function loadWeatherByCity(q: string,units: Units): Promise<UiData>
     geo.find(
       (g) =>
         (want.country ? g.country?.toUpperCase() === want.country : true) &&
-        (want.state ? (g.state?.toUpperCase() ?? "") === want.state : true)
+        (want.state ? (g.state?.toUpperCase() ?? "") === want.state : true),
     ) ?? geo[0];
 
   const { lat, lon, name, state, country } = pick;
 
   return loadWeatherByCoords(
     { lat, lon, label: [name, state, country].filter(Boolean).join(", ") },
-    units
+    units,
   );
 }
 
@@ -143,7 +151,7 @@ function degToCompass(deg: number | undefined): string {
 
 export async function loadWeatherByCoords(
   p: { lat: number; lon: number; label: string },
-  units: Units
+  units: Units,
 ): Promise<UiData> {
   const wxUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${p.lat}&lon=${p.lon}&units=${units}&appid=${API_KEY}`;
   const wx = await fetchJson<WeatherResponse>(wxUrl);
