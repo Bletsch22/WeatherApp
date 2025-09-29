@@ -28,45 +28,6 @@ type GeoWant = {
   country?: string;
 };
 
-// Need upgraded API subscription to use
-// function _mapOneCallHourly(
-//   list: any[],
-//   _units: Units,
-//   hours: number,
-// ): HourPoint[] {
-//   return list.slice(0, hours).map((h: any) => {
-//     const date = new Date(h.dt * 1000);
-//     const time = date.toLocaleTimeString([], { hour: "numeric" });
-//     const icon = `https://openweathermap.org/img/wn/${h.weather?.[0]?.icon}@2x.png`;
-//     return {
-//       dt: h.dt,
-//       time,
-//       temp: Math.round(h.temp),
-//       icon,
-//       desc: String(h.weather?.[0]?.description ?? ""),
-//       wind: Math.round(h.wind_speed), // OpenWeather uses wind_speed in One Call
-//     };
-//   });
-// }
-// export async function loadHourlyByCoords(
-//   coords: { lat: number; lon: number },
-//   units: Units,
-//   hours = 12,
-// ): Promise<HourPoint[]> {
-//   const url = `https://api.openweathermap.org/data/3.0/onecall?lat=${coords.lat}&lon=${coords.lon}&exclude=minutely,daily,alerts,current&units=${units}&appid=${API_KEY}`;
-//   const res = await fetchJson<any>(url);
-//   return mapOneCallHourly(res.hourly ?? [], units, hours);
-// }
-
-// export async function loadHourlyByCity(
-//   city: string,
-//   units: Units,
-//   hours = 12,
-// ): Promise<HourPoint[]> {
-//   const { lat, lon } = await cityToCoords(city);
-//   return loadHourlyByCoords({ lat, lon }, units, hours);
-// }
-
 export async function loadHourlyByCity(
   city: string,
   units: Units,

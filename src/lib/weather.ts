@@ -36,7 +36,9 @@ export type UiData = {
   humidity: number; // sweaty balls
   wind: number; // speed
   windDir: string; // compass direction
+  // wind_deg: number,
   pressure: number; // barometric pressure
+  clouds: number;
   coords?: { lat: number; lon: number };
 };
 type GeoWant = {
@@ -145,8 +147,26 @@ export async function loadWeatherByCity(
 // compass degree to direction conversions
 function degToCompass(deg: number | undefined): string {
   if (deg === undefined || Number.isNaN(deg)) return "-";
-  const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
-  return dirs[Math.round(deg / 45) % 8];
+
+  const dirs = [
+    "N",
+    "N, NE",
+    "NE",
+    "E-NE",
+    "E",
+    "E, SE",
+    "SE",
+    "S, SE",
+    "S",
+    "S, SW",
+    "SW",
+    "W, SW",
+    "W",
+    "W, NW",
+    "NW",
+    "N, NW",
+  ];
+  return dirs[Math.round(deg / 22.5) % 16];
 }
 
 export async function loadWeatherByCoords(
@@ -172,6 +192,8 @@ export async function loadWeatherByCoords(
     humidity: wx.main.humidity,
     wind: Math.round(wx.wind.speed),
     windDir: degToCompass(wx.wind.deg),
+    clouds: wx.clouds?.all ?? 0,
+    // wind_deg: wx.wind_deg,
     pressure: wx.main.pressure,
   };
 }

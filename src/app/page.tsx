@@ -333,20 +333,9 @@ export default function Home() {
                   <div style={{ textTransform: "capitalize", marginTop: 4 }}>
                     {data.desc}
                   </div>
+                  <div> Coverage: {data.clouds}%</div>
                 </div>
               </div>
-              {/* <button
-                type="button"
-                className="btn"
-                style={styles.btn}
-                onClick={async () => {
-                  setShowHourly((s) => !s);
-                  if (!hourly) await loadHourly();
-                }}
-                aria-pressed={showHourly}
-              >
-                Hourly Forecast
-              </button> */}
             </div>
 
             {/* RIGHT: meta 2×2 */}
@@ -363,7 +352,7 @@ export default function Home() {
               <div style={styles.cellWind}>
                 <Meta
                   label="Wind"
-                  value={`${data.wind} ${windUnit} ${data.windDir}`}
+                  value={`${data.wind} ${windUnit}, From: ${data.windDir} `}
                 />
               </div>
               <div style={styles.cellPressure}>

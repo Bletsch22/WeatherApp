@@ -41,4 +41,8 @@ export type WeatherResponse = {
     speed: number;
     deg?: number;
   };
+
+  clouds: {
+    all: number;
+  };
 };
